@@ -1,0 +1,302 @@
+[
+  {
+    "id": "challenge-python-beginner-01",
+    "title": "Build a To-Do List CLI",
+    "technology": "Python",
+    "level": "beginner",
+    "description": "Create a command-line to-do list application that allows the user to add, list, mark as done, and delete tasks. Tasks must be persisted to a plain-text file between runs. The program should handle invalid commands gracefully and provide a help menu.",
+    "evaluation_criteria": [
+      "User can add a task with a description",
+      "User can list all tasks with their status (pending / done)",
+      "User can mark a task as done by its index",
+      "User can delete a task by its index",
+      "Tasks are saved to and loaded from a file on each run",
+      "Invalid commands print a descriptive error message",
+      "A help command lists all available commands"
+    ],
+    "competencies_assessed": [
+      "Python syntax and semantics",
+      "file I/O",
+      "control flow",
+      "functions and scope",
+      "exception handling"
+    ],
+    "estimated_hours": 4
+  },
+  {
+    "id": "challenge-python-beginner-02",
+    "title": "CSV Grade Analyser",
+    "technology": "Python",
+    "level": "beginner",
+    "description": "Write a script that reads a CSV file containing student names and their grades for three subjects. The script must compute the average grade per student, identify the top-performing student, and output a formatted summary to the terminal. Missing values must be handled without crashing.",
+    "evaluation_criteria": [
+      "Script reads a CSV file provided as a command-line argument",
+      "Average grade per student is correctly computed",
+      "Top-performing student is identified and displayed",
+      "Missing or empty grade cells are treated as zero with a warning",
+      "Output is formatted in a clear, readable table",
+      "FileNotFoundError is caught and reported clearly"
+    ],
+    "competencies_assessed": [
+      "file I/O",
+      "built-in data types",
+      "list comprehensions",
+      "exception handling",
+      "modules and packages"
+    ],
+    "estimated_hours": 3
+  },
+  {
+    "id": "challenge-python-intermediate-01",
+    "title": "REST API Wrapper with Caching",
+    "technology": "Python",
+    "level": "intermediate",
+    "description": "Build a Python module that wraps a public REST API (such as a weather or currency API). Implement in-memory caching so that repeated requests within a 60-second window return the cached result instead of making a new HTTP call. Expose the module as a reusable package with a clean public API, unit tests, and a README.",
+    "evaluation_criteria": [
+      "HTTP requests are made with the requests library",
+      "Responses are cached in memory with a configurable TTL",
+      "Cache is bypassed after TTL expiry and a fresh request is made",
+      "Public API exposes a single get(endpoint, params) function",
+      "Unit tests mock the HTTP layer and verify caching behaviour",
+      "README documents installation, usage, and configuration"
+    ],
+    "competencies_assessed": [
+      "modules and packages",
+      "basic testing with pytest",
+      "exception handling",
+      "functions and scope",
+      "virtual environments"
+    ],
+    "estimated_hours": 8
+  },
+  {
+    "id": "challenge-python-advanced-01",
+    "title": "Async Web Scraper with Rate Limiting",
+    "technology": "Python",
+    "level": "advanced",
+    "description": "Implement an asynchronous web scraper using asyncio and aiohttp that crawls a list of seed URLs up to a configurable depth. Apply polite rate limiting (max requests per second per domain), respect robots.txt, and store scraped data in a SQLite database via aiosqlite. The scraper must handle network errors with exponential back-off and retry logic.",
+    "evaluation_criteria": [
+      "Crawler is fully asynchronous using asyncio and aiohttp",
+      "Configurable maximum crawl depth is respected",
+      "Rate limiting is enforced per domain (configurable RPS)",
+      "robots.txt is fetched and respected before crawling a domain",
+      "Scraped data is persisted to SQLite using aiosqlite",
+      "Network errors trigger exponential back-off with a configurable max retries",
+      "Graceful shutdown on SIGINT flushes pending writes to disk"
+    ],
+    "competencies_assessed": [
+      "classes and objects",
+      "exception handling",
+      "modules and packages",
+      "virtual environments",
+      "inheritance and composition"
+    ],
+    "estimated_hours": 20
+  },
+  {
+    "id": "challenge-ai-beginner-01",
+    "title": "Iris Classifier with scikit-learn",
+    "technology": "Artificial Intelligence",
+    "level": "beginner",
+    "description": "Train a k-nearest neighbours classifier on the Iris dataset using scikit-learn. Split the data into training and test sets, train the model, evaluate it with accuracy and a classification report, and plot the confusion matrix. Save the trained model to disk with joblib so it can be loaded and used without re-training.",
+    "evaluation_criteria": [
+      "Dataset is loaded with sklearn.datasets.load_iris",
+      "Train/test split uses an 80/20 ratio with a fixed random seed",
+      "KNN classifier is trained and accuracy on the test set is at least 90%",
+      "Classification report (precision, recall, F1) is printed",
+      "Confusion matrix is displayed or saved as an image",
+      "Trained model is serialised to disk and successfully reloaded"
+    ],
+    "competencies_assessed": [
+      "supervised and unsupervised learning",
+      "model evaluation and cross-validation",
+      "feature engineering"
+    ],
+    "estimated_hours": 4
+  },
+  {
+    "id": "challenge-ai-intermediate-01",
+    "title": "Sentiment Analysis Pipeline",
+    "technology": "Artificial Intelligence",
+    "level": "intermediate",
+    "description": "Build an end-to-end sentiment analysis pipeline using scikit-learn. Ingest a labelled text dataset, clean and tokenise the text, extract TF-IDF features, train a Logistic Regression classifier, and wrap everything in a scikit-learn Pipeline. Evaluate with stratified k-fold cross-validation and export the pipeline for later use.",
+    "evaluation_criteria": [
+      "Text is cleaned (lowercased, punctuation removed, stop-words filtered)",
+      "TF-IDF vectorisation is applied inside a Pipeline",
+      "Logistic Regression achieves at least 80% accuracy on the held-out set",
+      "Stratified 5-fold cross-validation results are reported",
+      "Pipeline is exported with joblib and can classify new strings after reload",
+      "A confusion matrix and per-class report are produced"
+    ],
+    "competencies_assessed": [
+      "scikit-learn pipelines",
+      "natural language processing fundamentals",
+      "model evaluation and cross-validation",
+      "feature engineering"
+    ],
+    "estimated_hours": 10
+  },
+  {
+    "id": "challenge-ai-advanced-01",
+    "title": "Fine-Tune a Text Classifier with HuggingFace Transformers",
+    "technology": "Artificial Intelligence",
+    "level": "advanced",
+    "description": "Fine-tune a pre-trained DistilBERT model on a multi-class text classification dataset of your choice using the HuggingFace Transformers Trainer API. Implement early stopping, log training metrics with Weights & Biases (or TensorBoard), and expose the final model as a FastAPI inference endpoint that returns class probabilities.",
+    "evaluation_criteria": [
+      "DistilBERT is loaded from HuggingFace Hub with AutoModelForSequenceClassification",
+      "Training uses the Trainer API with early stopping on validation loss",
+      "Final F1-macro on the test set is at least 85%",
+      "Training curves are visualised and interpreted in a short report",
+      "FastAPI endpoint accepts a text payload and returns a list of (label, probability) pairs",
+      "Endpoint is tested with at least three example requests in the README"
+    ],
+    "competencies_assessed": [
+      "transformer models and HuggingFace",
+      "natural language processing fundamentals",
+      "neural network architecture",
+      "model deployment with FastAPI",
+      "training with PyTorch"
+    ],
+    "estimated_hours": 25
+  },
+  {
+    "id": "challenge-agents-beginner-01",
+    "title": "Question-Answering Agent with Tool Use",
+    "technology": "AI Agents",
+    "level": "beginner",
+    "description": "Build a simple question-answering agent that can answer factual questions by calling a search tool and a calculator tool. The agent must decide which tool to use based on the question, call the tool with the correct arguments, and present the final answer clearly. Use any open or local LLM via a function-calling API.",
+    "evaluation_criteria": [
+      "Agent correctly routes arithmetic questions to the calculator tool",
+      "Agent correctly routes factual questions to the search tool",
+      "Tool results are incorporated into the final answer",
+      "Agent handles tool errors without crashing",
+      "Conversation history is maintained across at least three turns",
+      "System prompt clearly defines the agent's role and available tools"
+    ],
+    "competencies_assessed": [
+      "prompt engineering",
+      "LLM API integration",
+      "tool and function calling"
+    ],
+    "estimated_hours": 6
+  },
+  {
+    "id": "challenge-agents-intermediate-01",
+    "title": "Research Assistant Agent with Memory",
+    "technology": "AI Agents",
+    "level": "intermediate",
+    "description": "Create a research assistant agent that can browse a set of provided documents (PDFs or text files), store key facts in a vector store, and answer follow-up questions using RAG. The agent must maintain a conversation history and correctly attribute answers to their source documents. Build a minimal CLI interface for interacting with the agent.",
+    "evaluation_criteria": [
+      "Documents are chunked, embedded, and stored in a local vector store (e.g. Chroma)",
+      "Agent retrieves the top-3 relevant chunks for each question",
+      "Answers include a citation (document name and chunk index)",
+      "Conversation history is maintained across multiple turns",
+      "Agent indicates when a question cannot be answered from the provided documents",
+      "CLI accepts a directory of documents as input at startup"
+    ],
+    "competencies_assessed": [
+      "memory and context management",
+      "tool and function calling",
+      "LangChain / LangGraph",
+      "ReAct reasoning pattern",
+      "LLM API integration"
+    ],
+    "estimated_hours": 14
+  },
+  {
+    "id": "challenge-agents-advanced-01",
+    "title": "Multi-Agent Code Review System",
+    "technology": "AI Agents",
+    "level": "advanced",
+    "description": "Design and implement a multi-agent system where a supervisor agent distributes code review tasks to specialised sub-agents (security analyst, performance reviewer, style checker). Each sub-agent analyses the submitted code and returns structured findings. The supervisor aggregates results into a unified report and applies guardrails to prevent prompt injection in the submitted code.",
+    "evaluation_criteria": [
+      "At least three specialised sub-agents with distinct system prompts are implemented",
+      "Supervisor orchestrates sub-agents using a LangGraph StateGraph",
+      "Each sub-agent returns a structured JSON report with severity and description",
+      "Supervisor merges reports, deduplicates findings, and assigns overall risk level",
+      "Input guardrails detect and reject prompt injection attempts in submitted code",
+      "System is tested with at least five diverse code snippets with known issues",
+      "End-to-end execution trace is captured with LangSmith or equivalent"
+    ],
+    "competencies_assessed": [
+      "multi-agent orchestration",
+      "agent security and guardrails",
+      "LangChain / LangGraph",
+      "agent observability and tracing",
+      "error handling and fallback strategies"
+    ],
+    "estimated_hours": 30
+  },
+  {
+    "id": "challenge-n8n-beginner-01",
+    "title": "Daily Weather Report Automation",
+    "technology": "n8n",
+    "level": "beginner",
+    "description": "Build an n8n workflow that runs every morning at 7 AM, fetches the weather forecast for a configurable city from a public weather API, formats the data into a human-readable summary, and sends it as a message to a Slack channel or by email. All sensitive credentials must be stored in n8n credentials, not hardcoded.",
+    "evaluation_criteria": [
+      "Schedule Trigger fires daily at a configurable time",
+      "HTTP Request node fetches forecast data from a public weather API",
+      "Set or Code node formats temperature, conditions, and wind into a readable string",
+      "Message is delivered to Slack or email using a dedicated n8n node",
+      "API key is stored in an n8n credential, not in node parameters",
+      "Workflow includes an error handling branch that notifies on failure"
+    ],
+    "competencies_assessed": [
+      "trigger and node design",
+      "HTTP Request and REST API integration",
+      "data mapping and transformation",
+      "n8n installation and configuration"
+    ],
+    "estimated_hours": 3
+  },
+  {
+    "id": "challenge-n8n-intermediate-01",
+    "title": "Customer Support Ticket Classifier",
+    "technology": "n8n",
+    "level": "intermediate",
+    "description": "Build an n8n workflow triggered by an inbound webhook that receives support ticket JSON payloads, classifies each ticket by category and urgency using an AI node, routes the ticket to the appropriate team channel in Slack, and logs every classification decision to a Google Sheet for audit purposes.",
+    "evaluation_criteria": [
+      "Webhook node accepts POST requests and validates required fields",
+      "AI node classifies tickets into at least four categories with a confidence score",
+      "Switch node routes each ticket to the correct Slack channel based on category",
+      "High-urgency tickets also trigger a direct Slack mention to an on-call user",
+      "Each ticket and its classification are appended to a Google Sheet",
+      "Malformed payloads return an HTTP 400 response with an error message",
+      "Workflow execution errors are caught and logged to a separate error sheet"
+    ],
+    "competencies_assessed": [
+      "webhook design and security",
+      "AI node integration (LangChain in n8n)",
+      "conditional logic with IF and Switch nodes",
+      "error handling and retry policies",
+      "data mapping and transformation"
+    ],
+    "estimated_hours": 10
+  },
+  {
+    "id": "challenge-n8n-advanced-01",
+    "title": "Multi-Step Lead Enrichment Pipeline",
+    "technology": "n8n",
+    "level": "advanced",
+    "description": "Design an n8n workflow that listens for new CRM lead entries, enriches each lead by querying three external APIs (email verifier, company data provider, LinkedIn public profile), merges all results into a unified lead record, scores the lead using a Code node business rule engine, and syncs the enriched data back to the CRM. The pipeline must handle API rate limits with retry logic and deduplicate leads to avoid double-processing.",
+    "evaluation_criteria": [
+      "CRM trigger detects new lead entries in real time or near real time",
+      "Three separate HTTP Request nodes enrich the lead in parallel using the Wait node",
+      "Merge node correctly combines results from all three enrichment branches",
+      "Code node implements a scoring algorithm that produces a numeric lead score",
+      "Enriched record is written back to the CRM with the lead score field populated",
+      "Per-node retry policies handle rate-limit (HTTP 429) responses with back-off",
+      "Deduplication logic prevents the same lead from being processed twice",
+      "Workflow execution history and errors are logged to an external monitoring service"
+    ],
+    "competencies_assessed": [
+      "HTTP Request and REST API integration",
+      "JavaScript expressions and the Code node",
+      "error handling and retry policies",
+      "data mapping and transformation",
+      "workflow deployment and monitoring",
+      "conditional logic with IF and Switch nodes"
+    ],
+    "estimated_hours": 22
+  }
+]

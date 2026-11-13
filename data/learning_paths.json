@@ -1,0 +1,285 @@
+[
+  {
+    "id": "python-beginner-01",
+    "title": "Python Foundations",
+    "technology": "Python",
+    "level": "beginner",
+    "description": "A structured introduction to Python programming, covering syntax, data structures, and essential programming paradigms. Designed for learners with no prior programming experience who want to build a solid foundation before advancing to specialised domains.",
+    "competencies": [
+      "Python syntax and semantics",
+      "built-in data types",
+      "control flow",
+      "functions and scope",
+      "list comprehensions",
+      "file I/O",
+      "exception handling",
+      "modules and packages",
+      "virtual environments",
+      "basic testing with pytest",
+      "classes and objects",
+      "attributes and methods",
+      "encapsulation",
+      "inheritance and composition"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "Environment Setup and Python Basics",
+        "description": "Install Python and configure a virtual environment with venv. Explore the REPL, write your first script, and understand how variables, built-in types (int, float, str, bool, NoneType), and operators work. Practice type introspection with type() and isinstance().",
+        "competencies_developed": [
+          "Python syntax and semantics",
+          "built-in data types",
+          "virtual environments"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Control Flow and Functions",
+        "description": "Master conditional logic (if/elif/else), loops (for, while, break, continue), and define reusable functions with positional, keyword, default, and *args/**kwargs parameters. Understand scope (LEGB rule) and first-class function concepts.",
+        "competencies_developed": [
+          "control flow",
+          "functions and scope"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Collections, Comprehensions, and File I/O",
+        "description": "Deep-dive into lists, tuples, dictionaries, and sets. Write list and dictionary comprehensions for concise data transformation. Read and write text and CSV files using open() and the csv module. Handle common I/O exceptions gracefully.",
+        "competencies_developed": [
+          "list comprehensions",
+          "file I/O",
+          "exception handling"
+        ]
+      },
+      {
+        "order": 4,
+        "title": "Modules, Packages, and Testing",
+        "description": "Organise code into modules and packages with __init__.py. Install third-party libraries with pip and understand dependency pinning via requirements.txt. Write unit tests with pytest, use assertions, and run coverage reports.",
+        "competencies_developed": [
+          "modules and packages",
+          "virtual environments",
+          "basic testing with pytest"
+        ]
+      },
+      {
+        "order": 5,
+        "title": "Object-Oriented Programming in Python",
+        "description": "Understand the difference between classes and objects and how Python instantiates them via __init__. Define instance attributes, instance methods, class attributes, and class methods. Apply encapsulation by controlling access with name mangling and properties (getter/setter). Explore inheritance — single and multiple — and contrast it with composition as an alternative for code reuse. Use dataclasses as a concise syntax for data-centric classes.",
+        "competencies_developed": [
+          "classes and objects",
+          "attributes and methods",
+          "encapsulation",
+          "inheritance and composition"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ai-intermediate-01",
+    "title": "Artificial Intelligence — From Concepts to Practice",
+    "technology": "Artificial Intelligence",
+    "level": "intermediate",
+    "description": "A practical journey through the core pillars of modern AI: supervised learning, neural networks, natural language processing, and responsible deployment. Requires comfort with Python and basic linear algebra. Learners emerge able to build, evaluate, and explain end-to-end ML pipelines.",
+    "competencies": [
+      "supervised and unsupervised learning",
+      "feature engineering",
+      "model evaluation and cross-validation",
+      "scikit-learn pipelines",
+      "neural network architecture",
+      "training with PyTorch",
+      "natural language processing fundamentals",
+      "transformer models and HuggingFace",
+      "model deployment with FastAPI",
+      "AI ethics and bias auditing"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "Machine Learning Fundamentals",
+        "description": "Understand the ML workflow: data collection, exploratory data analysis (EDA), preprocessing, model selection, training, and evaluation. Implement linear regression and k-nearest neighbours from scratch, then replicate with scikit-learn. Master train/validation/test splits and cross-validation strategies.",
+        "competencies_developed": [
+          "supervised and unsupervised learning",
+          "feature engineering",
+          "model evaluation and cross-validation"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Scikit-learn Pipelines and Classical Algorithms",
+        "description": "Build reproducible scikit-learn Pipelines that chain imputation, scaling, encoding, and classifier steps. Compare decision trees, random forests, gradient boosting (XGBoost/LightGBM), and SVMs. Use GridSearchCV and Optuna for hyperparameter tuning. Interpret models with SHAP values.",
+        "competencies_developed": [
+          "scikit-learn pipelines",
+          "model evaluation and cross-validation",
+          "feature engineering"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Neural Networks and Deep Learning with PyTorch",
+        "description": "Build feedforward networks with torch.nn. Understand backpropagation, optimisers (SGD, Adam), and regularisation (dropout, batch normalisation). Train a convolutional network on an image dataset and interpret loss/accuracy curves. Save and load checkpoints.",
+        "competencies_developed": [
+          "neural network architecture",
+          "training with PyTorch"
+        ]
+      },
+      {
+        "order": 4,
+        "title": "Natural Language Processing and Transformers",
+        "description": "Tokenise text, compute TF-IDF embeddings, and fine-tune a pre-trained BERT model for text classification using the HuggingFace Transformers library. Evaluate with precision, recall, and F1. Explore zero-shot and few-shot inference with open models.",
+        "competencies_developed": [
+          "natural language processing fundamentals",
+          "transformer models and HuggingFace"
+        ]
+      },
+      {
+        "order": 5,
+        "title": "Model Deployment and Responsible AI",
+        "description": "Expose a trained model as a REST API with FastAPI and Pydantic. Containerise with Docker and document the endpoint with OpenAPI. Conduct a bias audit using Fairlearn, document model cards, and discuss GDPR implications for ML systems.",
+        "competencies_developed": [
+          "model deployment with FastAPI",
+          "AI ethics and bias auditing"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ai-agents-intermediate-01",
+    "title": "AI Agent Development",
+    "technology": "AI Agents",
+    "level": "intermediate",
+    "description": "A hands-on path covering the architecture and implementation of autonomous AI agents. Learners progress from prompt engineering fundamentals through tool-augmented agents, multi-agent systems, and production observability. Prior experience with Python and a working knowledge of LLMs is assumed.",
+    "competencies": [
+      "prompt engineering",
+      "LLM API integration",
+      "ReAct reasoning pattern",
+      "tool and function calling",
+      "LangChain / LangGraph",
+      "memory and context management",
+      "multi-agent orchestration",
+      "agent observability and tracing",
+      "error handling and fallback strategies",
+      "agent security and guardrails"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "Prompt Engineering and LLM APIs",
+        "description": "Understand how large language models generate text through next-token prediction. Master prompt engineering techniques: zero-shot, few-shot, chain-of-thought, and structured output prompting. Integrate OpenAI and Anthropic APIs in Python, manage API keys securely, and control generation with temperature and top-p sampling.",
+        "competencies_developed": [
+          "prompt engineering",
+          "LLM API integration"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "ReAct Agents and Tool Calling",
+        "description": "Implement the ReAct (Reason + Act) loop from scratch: the agent reasons about a goal, selects an action, calls a tool, observes the result, and iterates. Define tools as Python functions exposed via function-calling schemas (OpenAI tools format). Build agents that can search the web, run code, and query databases.",
+        "competencies_developed": [
+          "ReAct reasoning pattern",
+          "tool and function calling",
+          "LLM API integration"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "LangChain and LangGraph for Agent Workflows",
+        "description": "Use LangChain's LCEL (LangChain Expression Language) to compose chains of prompts, retrievers, and parsers. Model stateful, branching agent workflows as directed graphs with LangGraph. Implement conditional edges and human-in-the-loop approval steps. Persist agent state across turns with checkpointers.",
+        "competencies_developed": [
+          "LangChain / LangGraph",
+          "memory and context management",
+          "ReAct reasoning pattern"
+        ]
+      },
+      {
+        "order": 4,
+        "title": "Memory, Context Management, and Multi-Agent Systems",
+        "description": "Distinguish short-term (in-context), episodic (vector store), and semantic (knowledge graph) memory. Implement retrieval-augmented generation (RAG) to ground agents in private documents. Design multi-agent systems where specialised sub-agents are orchestrated by a supervisor agent using message passing.",
+        "competencies_developed": [
+          "memory and context management",
+          "multi-agent orchestration",
+          "tool and function calling"
+        ]
+      },
+      {
+        "order": 5,
+        "title": "Observability, Guardrails, and Production Readiness",
+        "description": "Instrument agents with LangSmith tracing for visibility into each reasoning step and tool call. Implement input/output guardrails to detect prompt injection, hallucination, and out-of-scope requests. Apply retry logic and fallback chains for reliability. Package agents as a FastAPI service with health checks and rate limiting.",
+        "competencies_developed": [
+          "agent observability and tracing",
+          "error handling and fallback strategies",
+          "agent security and guardrails"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "n8n-automation-beginner-01",
+    "title": "Automation with n8n",
+    "technology": "n8n",
+    "level": "beginner",
+    "description": "A practical introduction to workflow automation with n8n, the open-source low-code platform. Learners progress from installing n8n locally through connecting APIs, transforming data with JavaScript expressions, building AI-augmented workflows, and deploying reliable automations to production. No prior programming experience is required, though JavaScript basics are beneficial.",
+    "competencies": [
+      "n8n installation and configuration",
+      "trigger and node design",
+      "HTTP Request and REST API integration",
+      "JavaScript expressions and the Code node",
+      "data mapping and transformation",
+      "conditional logic with IF and Switch nodes",
+      "error handling and retry policies",
+      "webhook design and security",
+      "AI node integration (LangChain in n8n)",
+      "workflow deployment and monitoring"
+    ],
+    "steps": [
+      {
+        "order": 1,
+        "title": "n8n Setup and Core Concepts",
+        "description": "Install n8n via npm or Docker and explore the canvas UI. Understand the execution model: triggers fire workflows; nodes process data; each node receives items (JSON objects) and passes transformed items downstream. Build a first workflow: a Schedule trigger that fetches a public API and logs results to a Google Sheet.",
+        "competencies_developed": [
+          "n8n installation and configuration",
+          "trigger and node design",
+          "HTTP Request and REST API integration"
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Data Transformation and Expressions",
+        "description": "Use n8n's expression editor ({{ }}) and built-in methods to reshape data: access nested JSON fields, format dates with Luxon, manipulate strings, and compute derived values. Apply the Set node to normalise payloads and the Code node (JavaScript) for complex transformations that go beyond expressions.",
+        "competencies_developed": [
+          "JavaScript expressions and the Code node",
+          "data mapping and transformation"
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Conditional Logic, Loops, and Error Handling",
+        "description": "Route items through different branches using IF and Switch nodes. Process arrays of items with SplitInBatches and Merge nodes. Configure Error Trigger workflows and per-node retry policies. Build a notification workflow that sends a Slack alert when a downstream node fails.",
+        "competencies_developed": [
+          "conditional logic with IF and Switch nodes",
+          "error handling and retry policies",
+          "data mapping and transformation"
+        ]
+      },
+      {
+        "order": 4,
+        "title": "Webhooks, APIs, and Authentication",
+        "description": "Create inbound Webhook nodes that accept POST payloads from external services (e.g. GitHub, Stripe). Secure webhooks with header authentication and IP allow-lists. Use the HTTP Request node with OAuth2, API key, and Basic Auth credential types. Build a two-way sync between a CRM and a project management tool.",
+        "competencies_developed": [
+          "webhook design and security",
+          "HTTP Request and REST API integration",
+          "conditional logic with IF and Switch nodes"
+        ]
+      },
+      {
+        "order": 5,
+        "title": "AI-Augmented Workflows and Production Deployment",
+        "description": "Incorporate n8n's native LangChain nodes to add an LLM step into existing workflows: summarise emails, classify support tickets, or generate draft replies. Connect to vector stores for RAG-powered lookups. Deploy n8n on a VPS with environment-variable secrets management, configure execution log retention, and set up monitoring alerts.",
+        "competencies_developed": [
+          "AI node integration (LangChain in n8n)",
+          "workflow deployment and monitoring",
+          "error handling and retry policies"
+        ]
+      }
+    ]
+  }
+]

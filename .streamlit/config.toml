@@ -1,0 +1,25 @@
+# .streamlit/config.toml
+# Geo-Explorer — configuração visual do Streamlit
+
+[theme]
+# Primary accent colour
+primaryColor = "#3b82d4"
+# App background
+backgroundColor = "#ffffff"
+# Sidebar and widget background
+secondaryBackgroundColor = "#f7f8fa"
+# Main text colour
+textColor = "#1f2328"
+# Base font
+font = "sans serif"
+
+[client]
+showSidebarNavigation = false
+
+[server]
+# Do not open a browser tab automatically when running in headless environments
+headless = false
+
+[browser]
+# Disable the "Deploy to Streamlit Cloud" button in the toolbar
+gatherUsageStats = false
