@@ -255,6 +255,38 @@ A documentação técnica está disponível:
 - [Testes](docs/testing.md) — organização, execução, cobertura observada e
   limites dos testes.
 
+## Quais melhorias foram realizadas
+
+O Geo-Explorer expandiu a proposta original do desafio por meio de melhorias estruturais, arquiteturais e funcionais comprovadas no código e nos testes:
+
+- **Arquitetura em camadas desacopladas:** separação deliberada entre modelos de domínio (`core/models.py`), persistência e carregadores locais (`core/data_loader.py`), comandos e operações (`commands/`), interface web (`gui/`) e servidor de protocolo (`mcp_server/`). Os modelos utilizam dataclasses puras e enumerações, sem dependências externas no núcleo de domínio.
+- **Três interfaces de interação funcionais:**
+  - *CLI interativa (`main.py`):* menu orientado a texto com navegação guiada, cancelamento de operações e tratamento de entradas inválidas.
+  - *Interface gráfica com Streamlit (`gui/app.py`):* painel web estruturado em cinco páginas (`Home`, `Trilhas`, `Desafio Prático`, `Certificado` e `Análise de Competências`), com barra lateral personalizada e formulários responsivos.
+  - *Servidor MCP sobre stdio (`mcp_server/server.py`):* integração compatível com a especificação Model Context Protocol, disponibilizando quatro ferramentas prontas para consumo por agentes e clientes externos.
+- **Análise de competências e recomendações priorizadas:** motor de regras (`core/competency_analyzer.py`) que confronta competências autodeclaradas com as trilhas disponíveis, calcula percentuais de cobertura, mapeia lacunas e gera recomendações ordenadas por prioridade calculada (escala de 1 a 5).
+- **Suíte de 450 testes automatizados:** suíte executada via pytest com 450 testes automatizados aprovados, validando modelos de domínio, carregamento de catálogos, comandos CLI, adaptadores MCP e fluxos de tela da interface gráfica via `AppTest` do Streamlit.
+- **Documentação técnica dedicada:** estruturação da pasta `docs/` com especificações de arquitetura (diagramas Mermaid), guia MCP, catálogo de exemplos e documentação de testes.
+
+*Melhorias futuras planejadas (não implementadas no código atual):*
+- Armazenamento persistente de perfis e histórico em banco de dados relacional.
+- Correspondência semântica e tolerante a sinônimos na análise de competências (atualmente restrita a correspondência de texto exato).
+- Emissão física e exportação de certificados em formato PDF ou Markdown em disco.
+
+## O que foi aprendido durante o desafio
+
+A construção do projeto proporcionou a consolidação de conceitos essenciais de engenharia de software e desenvolvimento em Python:
+
+- **Modelagem de domínio e tipagem estrita:** uso de dataclasses, Enums e type hints modernos para estruturar dados com clareza, reduzir erros de execução e garantir contratos previsíveis entre módulos.
+- **Implementação do Model Context Protocol (MCP):** compreensão prática do padrão de ferramentas MCP, configuração de transporte stdio, validação de esquemas e isolamento rigoroso entre comunicação JSON-RPC no `stdout` e diagnósticos no `stderr`.
+- **Desenvolvimento e teste de interfaces web:** estruturação de fluxos com Streamlit gerenciados por `st.session_state` e utilização de `streamlit.testing.v1.AppTest` para testar telas e componentes programaticamente de forma automatizada.
+- **Qualidade de software e disciplina de testes:** formulação de testes unitários, testes de integração assíncronos e cenários de exceção com pytest, assegurando a robustez dos fluxos sem dependência de serviços externos.
+- **Desenvolvimento assistido por IA e senso crítico:** exercício da autonomia técnica na condução de assistentes de IA, atuando na arquitetura, revisão metódica de código, depuração e garantia de consistência entre código, testes e documentação.
+
+## Processo de desenvolvimento: IBM Bob → VS Code
+
+O desenvolvimento do Geo-Explorer foi iniciado com apoio do **IBM Bob** como ferramenta assistida por IA. Após a limitação de uso e o encerramento da cota de créditos na plataforma inicial, a continuidade do trabalho ocorreu no **Visual Studio Code**. O projeto foi mantido e desenvolvido em ambiente local, preservando a organização arquitetural em camadas, a execução dos testes automatizados e a integridade do fluxo de desenvolvimento.
+
 ## Limitações e avisos
 
 - As competências usadas na análise são **autodeclaradas** e **não são
