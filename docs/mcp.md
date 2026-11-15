@@ -77,9 +77,10 @@ cliente MCP específico declarada pelo Geo-Explorer.
 ## Ferramentas registradas
 
 Todas as assinaturas abaixo são as funções registradas nos decorators
-`@mcp.tool()`. Todos os parâmetros têm anotação de tipo e são obrigatórios:
-nenhuma dessas assinaturas declara valor padrão. Um parâmetro obrigatório de
-lista ainda pode aceitar uma lista vazia quando indicado.
+`@mcp.tool()`. Todos os parâmetros têm anotação de tipo. Todos são
+obrigatórios, exceto `competencies` em `generate_certificate`, que é
+opcional (`list[str] | None = None`). Parâmetros de lista obrigatórios ainda
+podem aceitar uma lista vazia quando indicado.
 
 As estruturas de retorno descritas são os dicionários de aplicação produzidos
 pelas funções e formatters do projeto. O cliente MCP recebe esses resultados
@@ -163,7 +164,7 @@ generate_certificate(
     activity: str,
     technology: str,
     level: str,
-    competencies: list[str],
+    competencies: list[str] | None = None,
 ) -> dict
 ```
 
@@ -171,9 +172,9 @@ generate_certificate(
 |---|---|---:|---|
 | `participant` | `str` | Sim | Não pode ser vazio ou conter apenas espaços. |
 | `activity` | `str` | Sim | Não pode ser vazio ou conter apenas espaços. |
-| `technology` | `str` | Sim | A assinatura exige o texto; a implementação não valida se ele corresponde ao catálogo nem rejeita texto vazio. |
+| `technology` | `str` | Sim | Deve corresponder à tecnologia da trilha selecionada no catálogo. |
 | `level` | `str` | Sim | Após remover espaços externos e converter para minúsculas, deve ser `beginner`, `intermediate` ou `advanced`. |
-| `competencies` | `list[str]` | Sim | Pode ser uma lista vazia. |
+| `competencies` | `list[str] \| None` | Não | Opcional. Se omitido, vazio (`[]`) ou composto só por textos em branco, usa as competências da trilha selecionada (uma cópia independente do catálogo). Em listas personalizadas, os espaços externos de cada item são removidos e os itens em branco são ignorados. |
 
 Não há parâmetro MCP para data de emissão: o builder usa a data atual. Exemplo
 válido com a trilha Python do catálogo:
@@ -188,19 +189,39 @@ válido com a trilha Python do catálogo:
 }
 ```
 
+Para usar as competências da própria trilha, omita `competencies` ou envie
+`[]`. As competências informadas pela pessoa não são combinadas com as da
+trilha.
+
 **Retorno de sucesso:** `id`, `participant`, `activity`, `technology`,
 `level`, `issued_on`, `competencies`, `disclaimer` e `recognition`.
 `issued_on` é serializado como data ISO-8601; o identificador é criado pelo
 builder. O disclaimer é
 `CERTIFICADO FICTÍCIO — SEM VALIDADE OFICIAL`.
 
-**Erros retornados como dicionário:** participante vazio, atividade vazia ou
-nível inválido resultam em `{"error": "<mensagem>"}`. As mensagens definidas
-pelo código são, respectivamente, `Participant name must not be empty.`,
-`Activity name must not be empty.` e
-`Invalid level '<valor>'. Valid values: beginner, intermediate, advanced.`
+**Erros retornados como dicionário:**
 
-O certificado é fictício e não tem validade oficial. Esta ferramenta retorna
+- Participante vazio: `Participant name must not be empty.`
+- Atividade vazia: `Activity name must not be empty.`
+- Nível vazio ou inválido: `Invalid level '<valor>'. Valid values: beginner, intermediate, advanced.`
+- Atividade que não corresponde a um título ou ID do catálogo:
+  `Atividade '<valor>' não encontrada no catálogo de trilhas. Trilhas disponíveis: <títulos>.`
+- Tecnologia vazia: `Technology must not be empty.`
+- Tecnologia incompatível com a trilha:
+  `Tecnologia '<valor>' incompatível com a trilha '<título>'. Tecnologia esperada: '<tecnologia>'.`
+- Nível válido, mas incompatível com a trilha:
+  `Nível '<valor>' incompatível com a trilha '<título>'. Nível esperado: '<nível>'.`
+- Catálogo indisponível, ilegível ou inválido:
+  `Failed to load learning paths catalog: <erro>`, em que `<erro>` representa a mensagem original da falha de carregamento.
+
+O certificado é fictício e não tem validade oficial. O nome do participante é
+informado pela pessoa. Competências personalizadas, quando fornecidas em
+`competencies`, também são informadas pela pessoa; quando o parâmetro é omitido
+ou enviado vazio (`[]` ou apenas itens em branco), são utilizadas as
+competências associadas à trilha no catálogo. Nenhuma competência é verificada
+pelo sistema. O certificado não comprova participação, progresso, conclusão de
+trilhas ou desafios, nem domínio de competências. O parâmetro `activity` aceita
+apenas o título ou o ID de uma trilha do catálogo. Esta ferramenta retorna
 dados; não gera PDF ou arquivo de exportação.
 
 ### `analyze_competencies`

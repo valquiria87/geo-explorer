@@ -98,25 +98,29 @@ específico entre os resultados disponíveis.
 
 ## Gerar um certificado fictício pela CLI
 
-A opção 3 solicita participante, atividade, tecnologia, nível e competências
-separadas por vírgula. Por exemplo:
+A opção 3 lista as trilhas do catálogo e solicita o nome do participante, a
+trilha (número, título ou ID) e, opcionalmente, competências separadas por
+vírgula. A tecnologia e o nível são preenchidos a partir da trilha escolhida,
+e deixar as competências em branco usa as competências da trilha. Por exemplo:
 
 ```text
 Opção do menu: 3
-Participante: Ana Exemplo
-Atividade: Python Foundations
-Tecnologia: Python
-Nível: beginner
-Competências: Python syntax and semantics, control flow
+Nome do participante: Ana Exemplo
+Escolha a trilha (número de 1 a 4, título ou ID): 1
+Competências associadas à atividade (separadas por vírgula, deixe vazio para usar as da trilha): control flow
 Opção do menu após o resultado: 5
 ```
 
-O comando exibe os dados do certificado e o aviso
-**CERTIFICADO FICTÍCIO — SEM VALIDADE OFICIAL**. O identificador é criado a
-cada geração, e a data de emissão corresponde à data corrente; portanto,
-esses valores não devem ser copiados como resultados fixos. O certificado é
-um registro de apresentação, não uma certificação profissional, e não há
-exportação de arquivo.
+O comando exibe o **Registro de Trilha e Competências Associadas** e o aviso
+**CERTIFICADO FICTÍCIO — SEM VALIDADE OFICIAL**. Competências personalizadas,
+quando fornecidas, são informadas pela pessoa; quando omitidas ou vazias, são
+utilizadas as competências associadas à trilha selecionada no catálogo. Essas
+competências não são verificadas. O certificado é fictício e não comprova
+participação, progresso, conclusão ou domínio de competências. O identificador
+é criado a cada geração, e a data de emissão corresponde à data corrente;
+portanto, esses valores não devem ser copiados como resultados fixos. O
+certificado é um registro de apresentação, não uma certificação profissional,
+e não há exportação de arquivo.
 
 ## Analisar competências pela CLI
 
@@ -173,16 +177,23 @@ disponíveis para aquela tecnologia e nível.
 
 ### Certificado
 
-Em **Certificado**, preencha participante, atividade, tecnologia e nível. No
-campo **Competências desenvolvidas**, informe uma competência por linha; o
-campo pode ficar vazio. Por exemplo, use `Ana Exemplo`, `Python Foundations`,
-`Python`, **Iniciante** e as competências `Python syntax and semantics` e
-`control flow`.
+Em **Certificado**, informe o participante e escolha a trilha na lista
+**Atividade (trilha de aprendizado)**, alimentada pelo catálogo: a tecnologia
+e o nível aparecem automaticamente e não há campo livre para inventar uma
+atividade. No campo **Competências associadas à atividade**, informe uma
+competência por linha; se o campo ficar vazio, são usadas as competências da
+trilha selecionada. Por exemplo, use `Ana Exemplo` e a trilha
+`Python Foundations (Python – Iniciante)`, deixando as competências em branco
+ou informando `Python syntax and semantics` e `control flow`.
 
-Clique em **Gerar certificado** para exibir os dados e o aviso de que ele é
-fictício e não tem validade oficial. A tecnologia não pode ficar vazia; nome
-do participante e atividade também precisam ser informados. O resultado fica
-na sessão e não é exportado.
+Clique em **Gerar certificado** para exibir o **Registro de Trilha e
+Competências Associadas** e o aviso de que ele é fictício e não tem validade
+oficial. Competências personalizadas, quando fornecidas, são informadas pela
+pessoa; se o campo ficar vazio, são usadas as competências associadas à trilha
+selecionada no catálogo. Nenhuma competência é verificada. O certificado não
+comprova participação, progresso, conclusão de trilhas ou desafios, nem
+domínio de competências. O nome do participante é obrigatório. O resultado
+fica na sessão e não é exportado.
 
 ### Análise de Competências
 
@@ -245,7 +256,11 @@ Argumentos:
 }
 ```
 
-O resultado contém os dados do certificado, inclusive identificador, data de
+A ferramenta gera um registro fictício baseado em uma trilha selecionada do
+catálogo (`activity` deve ser o título ou o ID de uma trilha), com informações
+autodeclaradas; ela não verifica progresso nem conclusão. O argumento
+`competencies` é opcional: omitido ou vazio, usa as competências da trilha. O
+resultado contém os dados do registro, inclusive identificador, data de
 emissão e disclaimer fictício. A ferramenta não exporta arquivo.
 
 ### Analisar competências

@@ -8,7 +8,8 @@ Coverage
 - Correct certificate generation (all required fields present).
 - Unique identifier per certificate.
 - Issue date: today (default) and a custom date.
-- Competencies are preserved exactly.
+- Competencies are preserved exactly (custom ones are stripped, blanks dropped).
+- Competencies not provided (None, [], blank strings) fall back to the trail's own.
 - Mandatory field validation (empty participant / empty activity).
 - Fictional-certificate disclaimer is always present.
 - Display formatting: all sections visible in printed output.
@@ -19,6 +20,7 @@ Run with:
 """
 
 import unittest
+from dataclasses import replace
 from datetime import date
 from io import StringIO
 from unittest.mock import patch
@@ -28,12 +30,17 @@ from commands.certificado import (
     build_certificate,
     display_certificate,
     generate_certificate,
+    resolve_learning_path,
 )
+from core.data_loader import load_learning_paths
+from core.models import Level, LearningPath
 
 
 # ---------------------------------------------------------------------------
 # Shared helpers / fixtures
 # ---------------------------------------------------------------------------
+
+_PATHS = load_learning_paths()
 
 _PARTICIPANT = "Ana Paula Souza"
 _ACTIVITY = "Python Foundations"
@@ -57,6 +64,7 @@ def _make_cert(**kwargs) -> dict:
         technology=_TECHNOLOGY,
         level=_LEVEL,
         competencies=list(_COMPETENCIES),
+        paths=_PATHS,
         issued_on=_FIXED_DATE,
     )
     defaults.update(kwargs)
@@ -79,6 +87,7 @@ def _capture_generate(**kwargs) -> str:
         technology=_TECHNOLOGY,
         level=_LEVEL,
         competencies=list(_COMPETENCIES),
+        paths=_PATHS,
         issued_on=_FIXED_DATE,
     )
     defaults.update(kwargs)
@@ -253,9 +262,10 @@ class TestBuildCertificateCompetencies(unittest.TestCase):
         cert = _make_cert(competencies=["machine learning"])
         self.assertEqual(cert["competencies"], ["machine learning"])
 
-    def test_empty_competencies_list_allowed(self):
+    def test_empty_competencies_list_falls_back_to_trail_competencies(self):
         cert = _make_cert(competencies=[])
-        self.assertEqual(cert["competencies"], [])
+        trail = next(p for p in _PATHS if p.title == _ACTIVITY)
+        self.assertEqual(cert["competencies"], trail.competencies)
 
     def test_competencies_is_a_copy(self):
         """Mutating the original list must not affect the stored certificate."""
@@ -270,6 +280,175 @@ class TestBuildCertificateCompetencies(unittest.TestCase):
         cert = _make_cert(competencies=original)
         cert["competencies"].append("competency Y")
         self.assertNotIn("competency Y", original)
+
+
+class TestBuildCertificateCompetencyFallback(unittest.TestCase):
+    """Competencies that were not provided fall back to the matched trail's own."""
+
+    @staticmethod
+    def _trail(title=_ACTIVITY):
+        return next(p for p in _PATHS if p.title == title)
+
+    def test_none_uses_trail_competencies(self):
+        cert = _make_cert(competencies=None)
+        self.assertEqual(cert["competencies"], self._trail().competencies)
+
+    def test_empty_list_uses_trail_competencies(self):
+        cert = _make_cert(competencies=[])
+        self.assertEqual(cert["competencies"], self._trail().competencies)
+
+    def test_only_blank_strings_use_trail_competencies(self):
+        for blank in ([""], [" "], ["  ", "\t", "\n"], ["", "   "]):
+            with self.subTest(blank=blank):
+                cert = _make_cert(competencies=blank)
+                self.assertEqual(cert["competencies"], self._trail().competencies)
+
+    def test_catalog_trails_have_competencies_to_fall_back_to(self):
+        for path in _PATHS:
+            with self.subTest(path=path.id):
+                self.assertTrue(path.competencies)
+
+    def test_custom_competencies_are_stripped_and_blank_items_dropped(self):
+        cert = _make_cert(
+            competencies=["  control flow  ", "", "   ", "file I/O\t", " classes "]
+        )
+        self.assertEqual(
+            cert["competencies"], ["control flow", "file I/O", "classes"]
+        )
+
+    def test_custom_competencies_are_not_merged_with_trail_competencies(self):
+        cert = _make_cert(competencies=["  only mine  "])
+        self.assertEqual(cert["competencies"], ["only mine"])
+
+    def test_fallback_uses_the_selected_trail_for_each_catalog_path(self):
+        for path in _PATHS:
+            with self.subTest(path=path.id):
+                cert = _make_cert(
+                    activity=path.title,
+                    technology=path.technology,
+                    level=path.level.value,
+                    competencies=[],
+                )
+                self.assertEqual(cert["competencies"], path.competencies)
+
+    def test_fallback_resolves_trail_given_by_id(self):
+        path = next(p for p in _PATHS if p.id == "ai-intermediate-01")
+        cert = _make_cert(
+            activity=path.id,
+            technology=path.technology,
+            level=path.level.value,
+            competencies=None,
+        )
+        self.assertEqual(cert["activity"], path.title)
+        self.assertEqual(cert["competencies"], path.competencies)
+
+    def test_fallback_list_is_independent_of_the_catalog(self):
+        trail = self._trail()
+        snapshot = list(trail.competencies)
+        cert = _make_cert(competencies=[])
+        self.assertIsNot(cert["competencies"], trail.competencies)
+        cert["competencies"].append("mutated")
+        cert["competencies"].remove(snapshot[0])
+        self.assertEqual(trail.competencies, snapshot)
+
+    def test_changing_the_catalog_afterwards_does_not_change_the_certificate(self):
+        local = replace(self._trail(), competencies=["alpha", "beta"])
+        cert = _make_cert(competencies=None, paths=[local])
+        local.competencies.append("gamma")
+        self.assertEqual(cert["competencies"], ["alpha", "beta"])
+
+    def test_two_fallback_certificates_do_not_share_the_list(self):
+        first = _make_cert(competencies=[])
+        second = _make_cert(competencies=[])
+        first["competencies"].append("extra")
+        self.assertNotIn("extra", second["competencies"])
+
+    def test_trail_without_competencies_yields_empty_list(self):
+        bare = replace(self._trail(), competencies=[])
+        for provided in (None, [], [" "], ["", "  "]):
+            with self.subTest(provided=provided):
+                cert = _make_cert(competencies=provided, paths=[bare])
+                self.assertEqual(cert["competencies"], [])
+
+    def test_generate_certificate_prints_trail_competencies_when_empty(self):
+        output = _capture_generate(competencies=[])
+        for competency in self._trail().competencies:
+            self.assertIn(competency, output)
+
+
+_RECORD_TITLE = "Registro de Trilha e Competências Associadas"
+_COMPETENCIES_LABEL = "Competências associadas à atividade"
+
+
+class TestRecordWordingMakesNoUnverifiedClaims(unittest.TestCase):
+    """The record only states what the system knows: a self-declared selection."""
+
+    def _recognition(self, **kwargs) -> str:
+        return _make_cert(**kwargs)["recognition"]
+
+    def test_recognition_makes_no_completion_or_participation_claim(self):
+        text = self._recognition().lower()
+        for claim in ("concluiu", "concluída", "concluído", "completou", "finalizou",
+                      "participou", "aprovado", "aprovada", "progresso pessoal"):
+            with self.subTest(claim=claim):
+                self.assertNotIn(claim, text)
+
+    def test_recognition_makes_no_competency_development_claim(self):
+        text = self._recognition().lower()
+        for claim in ("desenvolveu", "desenvolvendo", "dominou", "domina",
+                      "adquiriu", "aprendeu"):
+            with self.subTest(claim=claim):
+                self.assertNotIn(claim, text)
+
+    def test_recognition_states_trail_was_selected_from_the_catalog(self):
+        text = self._recognition()
+        self.assertIn("selecionada do catálogo", text)
+        self.assertIn(f'"{_ACTIVITY}"', text)
+        self.assertIn(_PARTICIPANT, text)
+
+    def test_recognition_states_competencies_are_associated_and_unverified(self):
+        text = self._recognition()
+        self.assertIn("associadas à trilha", text)
+        self.assertIn("não foram verificadas", text)
+
+    def test_recognition_declares_self_declared_fictional_record_without_validity(self):
+        text = self._recognition()
+        self.assertIn("autodeclaradas", text)
+        self.assertIn("fictício", text)
+        self.assertIn("sem validade oficial", text)
+
+    def test_recognition_explicitly_denies_proof_of_completion_or_mastery(self):
+        text = self._recognition()
+        self.assertIn("não comprova progresso, conclusão ou domínio", text)
+
+    def test_wording_is_the_same_for_every_catalog_trail(self):
+        for path in _PATHS:
+            with self.subTest(path=path.id):
+                text = self._recognition(
+                    activity=path.title,
+                    technology=path.technology,
+                    level=path.level.value,
+                    competencies=None,
+                ).lower()
+                self.assertIn(path.title.lower(), text)
+                self.assertNotIn("concluiu", text)
+                self.assertNotIn("desenvolvendo", text)
+                self.assertIn("selecionada do catálogo", text)
+
+    def test_printed_record_uses_the_new_title(self):
+        output = _capture_generate()
+        self.assertIn(_RECORD_TITLE, output)
+        self.assertNotIn("Certificado de Conclusão", output)
+
+    def test_printed_record_uses_the_new_competencies_label(self):
+        output = _capture_generate()
+        self.assertIn(f"{_COMPETENCIES_LABEL}:", output)
+        self.assertNotIn("Competências desenvolvidas", output)
+
+    def test_printed_record_keeps_disclaimer_and_recognition(self):
+        output = _capture_generate()
+        self.assertIn(DISCLAIMER, output)
+        self.assertIn("não foram verificadas", output)
 
 
 # ---------------------------------------------------------------------------
@@ -316,6 +495,30 @@ class TestBuildCertificateValidation(unittest.TestCase):
     def test_activity_is_stripped_in_output(self):
         cert = _make_cert(activity="  Python Foundations  ")
         self.assertEqual(cert["activity"], "Python Foundations")
+
+    def test_unregistered_activity_raises(self):
+        with self.assertRaises(ValueError):
+            _make_cert(activity="Curso de Culinária")
+
+    def test_activity_by_id_matches_catalog(self):
+        cert = _make_cert(activity="python-beginner-01")
+        self.assertEqual(cert["activity"], "Python Foundations")
+
+    def test_activity_by_technology_name_rejected_when_not_title(self):
+        with self.assertRaises(ValueError):
+            _make_cert(activity="Python")
+
+    def test_incompatible_technology_raises(self):
+        with self.assertRaises(ValueError):
+            _make_cert(technology="Java")
+
+    def test_incompatible_level_raises(self):
+        with self.assertRaises(ValueError):
+            _make_cert(level="advanced")
+
+    def test_paths_empty_or_none_raises(self):
+        with self.assertRaises(ValueError):
+            _make_cert(paths=[])
 
 
 # ---------------------------------------------------------------------------
@@ -408,7 +611,10 @@ class TestDisplayCertificateFormatting(unittest.TestCase):
         self.assertIn("=", self.output)
 
     def test_certificate_label_present(self):
-        self.assertIn("Certificado", self.output)
+        # The document is titled as a self-declared record and still identifies
+        # itself as a fictional certificate in the disclaimer banner.
+        self.assertIn("Registro de Trilha e Competências Associadas", self.output)
+        self.assertIn("CERTIFICADO FICTÍCIO", self.output)
 
 
 # ---------------------------------------------------------------------------
@@ -481,9 +687,11 @@ class TestCertificateIndependence(unittest.TestCase):
 
     def test_different_activities_stay_separate(self):
         cert_a = _make_cert(activity="Python Foundations")
-        cert_b = _make_cert(activity="AI Agents Challenge")
+        cert_b = _make_cert(
+            activity="Automation with n8n", technology="n8n", level="beginner"
+        )
         self.assertEqual(cert_a["activity"], "Python Foundations")
-        self.assertEqual(cert_b["activity"], "AI Agents Challenge")
+        self.assertEqual(cert_b["activity"], "Automation with n8n")
 
     def test_different_dates_stay_separate(self):
         d1 = date(2023, 1, 1)

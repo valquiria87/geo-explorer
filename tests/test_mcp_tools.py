@@ -26,6 +26,7 @@ from datetime import date
 
 import pytest
 
+from core.data_loader import load_learning_paths
 from core.models import Level, LearningPath, LearningStep, Challenge, CompetencyAnalysis
 from mcp_server.formatters import (
     format_certificate,
@@ -377,6 +378,31 @@ class TestGetChallengeTool:
 # ===========================================================================
 
 
+def _assert_description_is_unverified_record(description: str) -> None:
+    """The tool description must not claim completed trails or challenges."""
+    text = " ".join(description.split()).lower()
+    for expected in (
+        "fictional",
+        "selected from the geo-explorer catalog",
+        "self-declared",
+        "does not track progress",
+        "does not verify completion",
+        "challenges are not accepted",
+    ):
+        assert expected in text, expected
+    for forbidden in (
+        "completed",
+        "completion certificate",
+        "learning trail or challenge",
+    ):
+        assert forbidden not in text, forbidden
+
+
+def _catalog_competencies(title: str) -> list[str]:
+    """Competencies of the real catalog trail called *title*."""
+    return next(p for p in load_learning_paths() if p.title == title).competencies
+
+
 class TestGenerateCertificateTool:
     """generate_certificate_impl: success, empty fields, invalid level."""
 
@@ -397,7 +423,7 @@ class TestGenerateCertificateTool:
 
     def test_disclaimer_always_present(self):
         result = generate_certificate_impl(
-            "Bob", "n8n Automation", "n8n", "beginner", []
+            "Bob", "Automation with n8n", "n8n", "beginner", []
         )
         assert "FICTÍCIO" in result["disclaimer"]
         assert "VALIDADE OFICIAL" in result["disclaimer"]
@@ -419,11 +445,93 @@ class TestGenerateCertificateTool:
         )
         assert result["competencies"] == comps
 
-    def test_empty_competencies_allowed(self):
+    def test_empty_competencies_use_trail_competencies(self):
         result = generate_certificate_impl(
             "Ana", "Python Foundations", "Python", "beginner", []
         )
-        assert result["competencies"] == []
+        assert result["competencies"] == _catalog_competencies("Python Foundations")
+
+    def test_omitted_competencies_use_trail_competencies(self):
+        result = generate_certificate_impl(
+            "Ana", "Python Foundations", "Python", "beginner"
+        )
+        assert "error" not in result
+        assert result["competencies"] == _catalog_competencies("Python Foundations")
+
+    def test_none_competencies_use_trail_competencies(self):
+        result = generate_certificate_impl(
+            "Ana", "Python Foundations", "Python", "beginner", None
+        )
+        assert result["competencies"] == _catalog_competencies("Python Foundations")
+
+    def test_blank_only_competencies_use_trail_competencies(self):
+        for blank in ([""], [" "], ["  ", "", "\t"]):
+            result = generate_certificate_impl(
+                "Ana", "Python Foundations", "Python", "beginner", blank
+            )
+            assert result["competencies"] == _catalog_competencies("Python Foundations"), blank
+
+    def test_custom_competencies_are_stripped_and_blanks_dropped(self):
+        result = generate_certificate_impl(
+            "Ana", "Python Foundations", "Python", "beginner",
+            ["  control flow ", "", "   ", "\tfile I/O"],
+        )
+        assert result["competencies"] == ["control flow", "file I/O"]
+
+    def test_fallback_uses_competencies_of_each_selected_trail(self):
+        seen = set()
+        for path in load_learning_paths():
+            result = generate_certificate_impl(
+                "Ana", path.title, path.technology, path.level.value, []
+            )
+            assert "error" not in result, path.id
+            assert result["competencies"] == path.competencies, path.id
+            seen.add(tuple(result["competencies"]))
+        assert len(seen) == len(load_learning_paths())
+
+    def test_fallback_list_is_independent_between_calls_and_of_catalog(self):
+        first = generate_certificate_impl(
+            "Ana", "Python Foundations", "Python", "beginner", []
+        )
+        first["competencies"].append("mutated")
+        first["competencies"].pop(0)
+        second = generate_certificate_impl(
+            "Ana", "Python Foundations", "Python", "beginner", []
+        )
+        assert second["competencies"] == _catalog_competencies("Python Foundations")
+
+    def test_registered_description_declares_unverified_self_declared_record(self):
+        from mcp_server.tools.certificado import register
+
+        registered = {}
+
+        class _Recorder:
+            def tool(self, *args, **kwargs):
+                def decorator(fn):
+                    registered[fn.__name__] = fn
+                    return fn
+
+                return decorator
+
+        register(_Recorder())
+        _assert_description_is_unverified_record(registered["generate_certificate"].__doc__)
+
+    def test_trail_without_competencies_yields_empty_list(self):
+        bare = LearningPath(
+            id="bare-01",
+            title="Bare Path",
+            technology="Python",
+            level=Level.BEGINNER,
+            steps=[],
+            competencies=[],
+        )
+        for kwargs in ({}, {"competencies": None}, {"competencies": []},
+                       {"competencies": [" "]}):
+            result = generate_certificate_impl(
+                "Ana", "Bare Path", "Python", "beginner", paths=[bare], **kwargs
+            )
+            assert "error" not in result
+            assert result["competencies"] == [], kwargs
 
     def test_participant_preserved_stripped(self):
         result = generate_certificate_impl(
@@ -466,21 +574,36 @@ class TestGenerateCertificateTool:
 
     def test_intermediate_level_accepted(self):
         result = generate_certificate_impl(
-            "Ana", "AI Path", "AI Agents", "intermediate", []
+            "Ana", "AI Agent Development", "AI Agents", "intermediate", []
         )
         assert "error" not in result
 
     def test_advanced_level_accepted(self):
+        adv_path = LearningPath(
+            id="adv-01",
+            title="Advanced Path",
+            technology="Python",
+            level=Level.ADVANCED,
+            steps=[],
+            competencies=[],
+        )
         result = generate_certificate_impl(
-            "Ana", "Advanced Path", "Python", "advanced", []
+            "Ana", "Advanced Path", "Python", "advanced", [], paths=[adv_path]
         )
         assert "error" not in result
 
     def test_recognition_mentions_participant(self):
         result = generate_certificate_impl(
-            "Carlos", "n8n Automation", "n8n", "beginner", []
+            "Carlos", "Automation with n8n", "n8n", "beginner", []
         )
         assert "Carlos" in result["recognition"]
+
+    def test_unregistered_activity_returns_error(self):
+        result = generate_certificate_impl(
+            "Ana", "Curso Desconhecido", "Python", "beginner", []
+        )
+        assert "error" in result
+        assert "não encontrada no catálogo" in result["error"]
 
 
 # ===========================================================================
@@ -674,6 +797,38 @@ class TestMCPProtocolIntegration:
         assert "error" not in data
         assert "disclaimer" in data
         assert "FICTÍCIO" in data["disclaimer"]
+
+    @pytest.mark.anyio
+    async def test_generate_certificate_competencies_optional_via_protocol(self):
+        """competencies may be omitted or empty; both use the trail's own list."""
+        from mcp import Client
+        base = {
+            "participant": "Test User",
+            "activity": "Python Foundations",
+            "technology": "Python",
+            "level": "beginner",
+        }
+        async with Client(create_server()) as client:
+            listed = await client.list_tools()
+            omitted = await client.call_tool("generate_certificate", base)
+            empty = await client.call_tool(
+                "generate_certificate", {**base, "competencies": []}
+            )
+        tool = next(t for t in listed.tools if t.name == "generate_certificate")
+        schema = getattr(tool, "inputSchema", None) or getattr(tool, "input_schema")
+        assert "competencies" not in schema.get("required", [])
+        expected = _catalog_competencies("Python Foundations")
+        assert json.loads(omitted.content[0].text)["competencies"] == expected
+        assert json.loads(empty.content[0].text)["competencies"] == expected
+
+    @pytest.mark.anyio
+    async def test_generate_certificate_description_via_protocol(self):
+        """The manifest description does not claim completed trails or challenges."""
+        from mcp import Client
+        async with Client(create_server()) as client:
+            listed = await client.list_tools()
+        tool = next(t for t in listed.tools if t.name == "generate_certificate")
+        _assert_description_is_unverified_record(tool.description)
 
     @pytest.mark.anyio
     async def test_analyze_competencies_via_protocol(self):

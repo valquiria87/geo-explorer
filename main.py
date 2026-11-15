@@ -11,7 +11,8 @@ Etapa 10 — CLI integration of four commands:
 
 from __future__ import annotations
 
-from core.models import Level
+from core.data_loader import load_learning_paths
+from core.models import LearningPath, Level
 from commands.trilha import show_learning_path
 from commands.desafio import generate_challenge
 from commands.certificado import generate_certificate
@@ -98,56 +99,85 @@ def _menu_desafio() -> None:
 
 
 def _menu_certificado() -> None:
-    """Option 3 — generate a fictional certificate."""
+    """Option 3 — generate a fictional certificate for a catalog learning path."""
     print("\n--- Gerar Certificado Fictício ---")
 
-    participant = _prompt_required("Nome do participante: ")
+    try:
+        paths = load_learning_paths()
+    except Exception as exc:
+        print(f"Erro ao carregar catálogo de trilhas: {exc}")
+        return
+
+    if not paths:
+        print("Nenhuma trilha encontrada no catálogo.")
+        return
+
+    print("\nTrilhas disponíveis para emissão de certificado:")
+    for i, path in enumerate(paths, start=1):
+        print(
+            f"  {i}. {path.title} "
+            f"(Tecnologia: {path.technology} | Nível: {path.level.value})"
+        )
+
+    activity_raw = _prompt_required(
+        f"\nEscolha a trilha (número de 1 a {len(paths)}, título ou ID): "
+    )
+    if activity_raw is None:
+        print("Operação cancelada.")
+        return
+
+    selected_path: LearningPath | None = None
+
+    if activity_raw.isdigit():
+        index = int(activity_raw)
+        if 1 <= index <= len(paths):
+            selected_path = paths[index - 1]
+    else:
+        needle = activity_raw.strip().lower()
+        for path in paths:
+            if (
+                path.id.strip().lower() == needle
+                or path.title.strip().lower() == needle
+            ):
+                selected_path = path
+                break
+
+    if selected_path is None:
+        print("Trilha não encontrada no catálogo. Nenhum certificado foi gerado.")
+        return
+
+    print(f"  Trilha selecionada: {selected_path.title}")
+    print(f"  Tecnologia vinculada: {selected_path.technology}")
+    print(f"  Nível vinculado: {selected_path.level.value}")
+
+    participant = _prompt_required("\nNome do participante: ")
     if participant is None:
         print("Operação cancelada.")
         return
 
-    activity = _prompt_required("Nome da atividade concluída: ")
-    if activity is None:
-        print("Operação cancelada.")
-        return
-
-    technology = _prompt_required("Tecnologia principal (ex: Python): ")
-    if technology is None:
-        print("Operação cancelada.")
-        return
-
-    level_str: str | None = None
-    while level_str is None:
-        raw_level = _prompt(
-            f"Nível ({_VALID_LEVELS}): "
-        )
-        if raw_level.lower() == "cancelar":
-            print("Operação cancelada.")
-            return
-        if _parse_level(raw_level) is not None:
-            level_str = raw_level.strip().lower()
-        else:
-            print(f"  Nível inválido: '{raw_level}'. "
-                  f"Valores aceitos: {_VALID_LEVELS}. "
-                  "Digite 'cancelar' para voltar ao menu.")
-
     raw_competencies = _prompt(
-        "Competências desenvolvidas (separadas por vírgula, pode deixar vazio): "
+        "Competências associadas à atividade "
+        "(separadas por vírgula, deixe vazio para usar as da trilha): "
     )
-    competencies = (
-        [c.strip() for c in raw_competencies.split(",") if c.strip()]
-        if raw_competencies
-        else []
-    )
+
+    if raw_competencies:
+        competencies = [
+            item.strip()
+            for item in raw_competencies.split(",")
+            if item.strip()
+        ]
+    else:
+        competencies = []
 
     print()
     try:
         generate_certificate(
             participant=participant,
-            activity=activity,
-            technology=technology,
-            level=level_str,
+            activity=selected_path.title,
+            technology=selected_path.technology,
+            level=selected_path.level.value,
             competencies=competencies,
+            paths=paths,
         )
     except ValueError as exc:
         print(f"Erro ao gerar certificado: {exc}")

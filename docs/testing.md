@@ -46,7 +46,7 @@ repositório, com esse ambiente ativado.
 ### Suíte completa
 
 ```powershell
-python -m pytest -q
+python -m pytest tests -q
 ```
 
 ### Um arquivo específico
@@ -68,7 +68,7 @@ python -m pytest -q tests\test_data_loader.py tests\test_competency_analyzer.py
 **Comandos CLI:**
 
 ```powershell
-python -m pytest -q tests\test_trilha.py tests\test_desafio.py tests\test_certificado.py tests\test_analise.py
+python -m pytest -q tests\test_trilha.py tests\test_desafio.py tests\test_certificado.py tests\test_analise.py tests\test_main.py
 ```
 
 **Interface Streamlit:**
@@ -89,7 +89,7 @@ completa: ele não executa funções de teste no estilo pytest.
 
 ## Organização dos testes
 
-Há 12 arquivos `test_*.py` em `tests/`. Não existe um arquivo dedicado apenas
+Há 13 arquivos `test_*.py` em `tests/`. Não existe um arquivo dedicado apenas
 aos dataclasses de `core/models.py`; os modelos são exercitados pelos testes
 de carregamento, análise, comandos e formatters.
 
@@ -117,11 +117,18 @@ de carregamento, análise, comandos e formatters.
   correspondência sem diferença de caixa, ausência de resultados, entradas
   inválidas, conteúdo da saída e integridade dos dados e identificadores.
 - [test_certificado.py](../tests/test_certificado.py) verifica dados gerados,
-  identificadores únicos, data padrão e datas fornecidas, competências,
-  validação de participante e atividade, disclaimer e formatação impressa.
+  identificadores únicos, data padrão e datas fornecidas, competências
+  (incluindo o uso das competências da trilha quando não informadas ou em
+  branco, a remoção de espaços, a independência em relação ao catálogo e
+  trilhas sem competências), validação de participante e atividade,
+  disclaimer e formatação impressa.
 - [test_analise.py](../tests/test_analise.py) verifica a formatação CLI da
   análise, o índice e aviso de autodeclaração, correspondências, lacunas,
   competências extras, recomendações, prioridades e filtragem por interesse.
+- [test_main.py](../tests/test_main.py) verifica a seleção de atividades do
+  catálogo por número, título ou identificador, competências personalizadas,
+  seleção desconhecida, cancelamento e tratamento de catálogo vazio ou com
+  falha de carregamento.
 
 ### Interface Streamlit
 
@@ -138,8 +145,9 @@ pontuais para estados que seriam difíceis de produzir com os catálogos reais:
   sem resultado e erros de carregamento.
 - [test_gui_certificado.py](../tests/test_gui_certificado.py) verifica
   submissão do formulário, dados e disclaimer, entradas obrigatórias,
-  competências vazias, parsing de linhas e manutenção do certificado ao
-  navegar entre páginas.
+  campo de competências vazio ou só com linhas em branco (que usa as
+  competências da trilha), texto de ajuda, trilha sem competências,
+  parsing de linhas e manutenção do certificado ao navegar entre páginas.
 - [test_gui_analise.py](../tests/test_gui_analise.py) verifica submissão e
   estado do perfil, análise de todas as trilhas quando nenhum interesse é
   selecionado, navegação e retenção dos resultados, ordem das recomendações,
@@ -183,9 +191,10 @@ os removem ao final; eles não substituem os catálogos do projeto.
 
 - **Visualização completa no navegador:** AppTest verifica elementos e
   interações, não layout visual completo, responsividade ou diferenças entre
-  navegadores. Isso exige uma revisão manual no navegador. O histórico da
-  Etapa 12.6 registra uma verificação visual pontual da navegação, não uma
-  validação visual abrangente de todas as páginas.
+  navegadores. Isso exige uma revisão manual no navegador.
+  A verificação visual pontual da navegação foi realizada após as correções
+  N-01, N-02 e N-03. Isso não representa uma validação visual abrangente
+  de todas as páginas.
 - **MCP stdio e clientes externos:** a suíte não inicia o servidor por stdio
   nem testa interoperabilidade com clientes MCP externos. Essa validação
   requer iniciar o processo pelo cliente escolhido.
@@ -218,13 +227,15 @@ testes aprovados pode mudar conforme os testes do repositório mudarem.
 
 ## Último resultado registrado
 
-O histórico disponível registra a execução da suíte completa após a correção
-de navegação da Etapa 12.6:
+A execução local mais recente da suíte principal, após as correções N-01, N-02 e N-03, apresentou:
 
 ```text
-python -m pytest -q
-450 passed
+- python -m pytest tests -q
+512 passed, 53 subtests passed in 7.17s
 ```
+
+Como marco histórico, a execução da Etapa 12.6 registrou `450 passed`; esse
+resultado não substitui a execução mais recente acima.
 
 Esse é o último resultado registrado, **não uma execução realizada durante a
 criação deste documento**. Nenhum teste foi executado nesta atividade.

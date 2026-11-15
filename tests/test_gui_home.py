@@ -30,6 +30,33 @@ def test_home_renders_four_feature_cards_and_active_buttons():
     } <= button_keys
 
 
+def _home_text() -> str:
+    app = AppTest.from_file(str(_APP_PATH)).run()
+    assert not app.exception
+    # Streamlit keeps source line breaks inside paragraphs; normalise whitespace.
+    return " ".join(" ".join(item.value for item in app.markdown).split())
+
+
+def test_home_does_not_promise_completion_or_progress_tracking():
+    text = _home_text()
+
+    for old_text in (
+        "ao concluir",
+        "de conclusão",
+        "acompanhe sua evolução",
+    ):
+        assert old_text not in text
+
+
+def test_home_describes_certificate_as_self_declared_record():
+    text = _home_text()
+
+    assert "a partir de uma trilha do catálogo" in text
+    assert "competências autodeclaradas e não verificadas" in text
+    assert "registram uma trilha do catálogo e competências autodeclaradas" in text
+    assert "compare suas competências autodeclaradas" in text
+
+
 @pytest.mark.parametrize(
     ("button_key", "page_title"),
     [

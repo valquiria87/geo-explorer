@@ -19,6 +19,9 @@ env/
 
 # Test & coverage artefacts
 .pytest_cache/
+/files/
+/files.01/
+/gui/files/
 .coverage
 htmlcov/
 

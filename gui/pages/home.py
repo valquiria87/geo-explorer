@@ -28,8 +28,9 @@ def render() -> None:
 
     st.markdown(
         """
-        Identifique lacunas de conhecimento, siga trilhas estruturadas e
-        acompanhe sua evolução técnica — tudo em um único ambiente.
+        Identifique lacunas de conhecimento, explore trilhas estruturadas e
+        compare suas competências autodeclaradas com elas — tudo em um único
+        ambiente.
         """
     )
 
@@ -41,13 +42,13 @@ def render() -> None:
         """
         O **Geo-Explorer** é uma plataforma de aprendizagem estruturada que
         mapeia competências técnicas, sugere trilhas de estudo e desafios
-        práticos, e emite certificados fictícios de conclusão.
+        práticos, e gera certificados fictícios que registram uma trilha do
+        catálogo e competências autodeclaradas.
 
-        O projeto utiliza Python como linguagem principal e possui
-        dependências externas, incluindo Streamlit e o SDK MCP. Também foi
-        desenvolvido com ênfase em design de domínio limpo, cobertura de testes
-        e arquitetura extensível — incluindo uma interface de linha de comando
-        completa e um servidor MCP para integração com agentes de IA.
+        O projeto utiliza Python como linguagem principal, oferece uma
+        interface de linha de comando e uma interface Streamlit, e expõe
+        quatro ferramentas MCP para clientes compatíveis. Também conta com
+        testes automatizados.
         """
     )
 
@@ -75,8 +76,8 @@ def render() -> None:
         st.markdown(
             """
             #### 🎯 Desafio Prático
-            Receba um desafio personalizado para consolidar conhecimentos.
-            Inclui critérios de avaliação e competências avaliadas.
+            Escolha entre desafios existentes por tecnologia e nível.
+            Cada desafio inclui critérios de avaliação e competências avaliadas.
             """
         )
         if st.button("Explorar Desafio →", key="home_go_desafio"):
@@ -91,6 +92,8 @@ def render() -> None:
             #### 📊 Análise de Competências
             Declare suas competências atuais e receba uma análise
             priorizada das lacunas em relação às trilhas disponíveis.
+            Use os nomes completos das competências do catálogo para obter
+            correspondências.
             """
         )
         if st.button("Analisar Competências →", key="home_go_analise"):
@@ -101,7 +104,8 @@ def render() -> None:
         st.markdown(
             """
             #### 🏅 Certificado
-            Gere um certificado fictício ao concluir uma atividade.
+            Gere um certificado fictício a partir de uma trilha do catálogo,
+            com competências autodeclaradas e não verificadas.
             Inclui disclaimer explícito de não-validade oficial.
             """
         )
@@ -116,11 +120,11 @@ def render() -> None:
 
     tc1, tc2, tc3, tc4 = st.columns(4)
     with tc1:
-        st.metric(label="Linguagem", value="Python 3.15")
+        st.metric(label="Linguagem", value="Python")
     with tc2:
-        st.metric(label="Interface", value="Streamlit 1.67")
+        st.metric(label="Interface", value="Streamlit")
     with tc3:
-        st.metric(label="Protocolo IA", value="MCP 2.x")
+        st.metric(label="Protocolo", value="MCP via stdio")
     with tc4:
         st.metric(label="Testes", value="Automatizados")
 

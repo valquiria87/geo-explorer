@@ -16,7 +16,8 @@ import logging
 from mcp.server import MCPServer
 
 from commands.certificado import build_certificate
-from core.models import Level
+from core.data_loader import load_learning_paths
+from core.models import LearningPath, Level
 from mcp_server.formatters import format_certificate
 
 logger = logging.getLogger(__name__)
@@ -34,9 +35,10 @@ def generate_certificate_impl(
     activity: str,
     technology: str,
     level: str,
-    competencies: list[str],
+    competencies: list[str] | None = None,
+    paths: list[LearningPath] | None = None,
 ) -> dict:
-    """Build a fictional completion certificate and return it as a JSON-safe dict.
+    """Build a fictional trail-and-competency record and return it as a JSON-safe dict.
 
     This function contains all business logic for the tool and can be called
     directly in unit tests without any MCP transport.
@@ -46,14 +48,21 @@ def generate_certificate_impl(
     participant:
         Full name of the learner.  Must not be empty.
     activity:
-        Name of the completed learning trail or challenge.  Must not be empty.
+        Title or ID of a learning trail from the catalog (challenges are not
+        accepted).  Must not be empty.
     technology:
         Primary technology covered (e.g. ``"Python"``).
     level:
         Proficiency level string — one of ``"beginner"``, ``"intermediate"``,
         or ``"advanced"``.
     competencies:
-        List of competency tags developed during the activity.
+        Optional.  Competency tags associated with the trail (self-declared and
+        not verified).  When omitted
+        (``None``), empty, or made only of blank strings, the competencies of the
+        matched learning trail are used.  Custom tags are stripped and blank
+        items are dropped.
+    paths:
+        Optional list of LearningPath instances; loads from catalog file if None.
 
     Returns
     -------
@@ -84,6 +93,12 @@ def generate_certificate_impl(
         activity,
     )
 
+    if paths is None:
+        try:
+            paths = load_learning_paths()
+        except Exception as exc:
+            return {"error": f"Failed to load learning paths catalog: {exc}"}
+
     try:
         cert = build_certificate(
             participant=participant,
@@ -91,6 +106,7 @@ def generate_certificate_impl(
             technology=technology,
             level=level_stripped,
             competencies=competencies,
+            paths=paths,
         )
     except ValueError as exc:
         return {"error": str(exc)}
@@ -112,16 +128,22 @@ def register(mcp: MCPServer) -> None:
         activity: str,
         technology: str,
         level: str,
-        competencies: list[str],
+        competencies: list[str] | None = None,
     ) -> dict:
-        """Generate a fictional (non-official) completion certificate.
+        """Generate a fictional (non-official) record based on a learning trail
+        selected from the Geo-Explorer catalog.
 
-        Creates a Geo-Explorer certificate record for a learner who completed a
-        learning trail or challenge.  The certificate is explicitly labelled as
-        fictional and carries no professional credential value.
+        The record contains self-declared information: *activity* must be the
+        title or ID of a catalog trail (challenges are not accepted) and the
+        competencies are only associated with that trail.  The tool does not
+        track progress and does not verify completion of trails or challenges.
+        The record is explicitly labelled as fictional and carries no
+        professional credential value.
 
         *level* must be one of ``"beginner"``, ``"intermediate"``, or
-        ``"advanced"``.  *competencies* may be an empty list.
+        ``"advanced"``.  *competencies* is optional: omit it, or send an empty
+        list, to use the competencies of the selected learning trail.  Custom
+        entries are stripped and blank entries are ignored.
 
         Returns an ``{"error": "..."}`` dict when validation fails.
         """
