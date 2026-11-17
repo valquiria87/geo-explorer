@@ -1,16 +1,40 @@
 """
-Geo-Explorer — Ponto de Entrada da Interface Web (Streamlit)
+Geo-Explorer — Streamlit Web Application Entry Point
 """
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-# Adiciona a raiz do projeto ao sys.path para garantir que todos os módulos
-# (gui, core, commands, data) sejam importados sem erros na nuvem.
+# Garante que a raiz do projeto esteja no sys.path para carregar gui, core e data
 ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-# Carrega e executa a aplicação do Streamlit
-from gui.app import *
+import streamlit as st
+
+from gui.components.sidebar import render_sidebar
+from gui.pages import analise, certificado, desafio, home, trilhas
+
+# 1. Configuração da página (primeiro comando do Streamlit)
+st.set_page_config(
+    page_title="Geo-Explorer",
+    page_icon="🌍",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# 2. Renderiza o menu lateral customizado e identifica a página ativa
+page = render_sidebar()
+
+# 3. Roteador de telas
+if page == "home":
+    home.render()
+elif page == "trilhas":
+    trilhas.render()
+elif page == "desafio":
+    desafio.render()
+elif page == "certificado":
+    certificado.render()
+elif page == "analise":
+    analise.render()
