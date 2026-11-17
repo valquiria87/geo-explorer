@@ -18,7 +18,7 @@ showSidebarNavigation = false
 
 [server]
 # Do not open a browser tab automatically when running in headless environments
-headless = false
+headless = true
 
 [browser]
 # Disable the "Deploy to Streamlit Cloud" button in the toolbar
