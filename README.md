@@ -1,39 +1,63 @@
-# Geo-Explorer
+# 🌍 Geo-Explorer — Intelligent Career Navigator
 
-Aplicação Python para explorar trilhas de aprendizagem, desafios práticos e
-lacunas de competências por meio de interfaces Streamlit, CLI e MCP.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://geo-explorer-m4jez9zbqnnzzetrufldry.streamlit.app/)
+[![Tests](https://img.shields.io/badge/tests-512%20passed-success)](tests/)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org/)
+[![Protocol](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-8A2BE2)](https://modelcontextprotocol.io/)
 
-## Objetivo e público-alvo
+> **Aplicação interativa em Python para mapeamento de competências técnicas, trilhas de aprendizagem e geração de desafios, com suporte a interface Web (Streamlit), Terminal (CLI) e integração com agentes de IA via MCP (Model Context Protocol).**
 
-O Geo-Explorer organiza catálogos locais de trilhas e desafios e compara as
-competências informadas por uma pessoa com as competências descritas nesses
-catálogos. É voltado a pessoas em aprendizagem autodirigida e a quem deseja
-explorar ou estudar um projeto Python com interfaces gráfica, de linha de
-comando e de integração MCP.
+🔗 **Acesse a aplicação no ar:** [geo-explorer.streamlit.app](https://geo-explorer-m4jez9zbqnnzzetrufldry.streamlit.app/)
 
-O projeto expõe funcionalidades por ferramentas MCP para clientes
-compatíveis. Ele **não executa agentes de IA nem modelos de IA**.
+---
 
-## Funcionalidades implementadas
+## 🎯 Problema e Solução de Negócio
 
-- **Trilhas de aprendizagem:** consulta trilhas por tecnologia, com nível,
-  descrição, competências e etapas ordenadas.
-- **Desafios práticos:** filtra desafios por tecnologia e nível. A CLI e a
-  ferramenta MCP escolhem um desafio compatível; na interface gráfica, a
-  pessoa seleciona um dos desafios disponíveis.
-- **Análise de competências:** compara as competências informadas com as
-  trilhas, apresenta índice de cobertura declarada, lacunas e recomendações
-  priorizadas.
-- **Certificados fictícios:** gera um registro com participante, atividade,
-  tecnologia, nível, competências, data e identificador.
-- **Interface Streamlit:** disponibiliza páginas para Home, Trilhas, Desafio
-  Prático, Certificado e Análise de Competências.
-- **Interface CLI:** apresenta um menu interativo para consultar trilhas,
-  gerar desafios e certificados fictícios e analisar competências.
-- **Servidor MCP:** disponibiliza quatro ferramentas:
-  `get_learning_path`, `get_challenge`, `generate_certificate` e
-  `analyze_competencies`.
+No ecossistema de tecnologia, profissionais autodidatas frequentemente enfrentam dificuldades para identificar lacunas de competências (*skill gaps*) em relação a papéis de mercado. 
 
+O **Geo-Explorer** resolve esse problema estruturando:
+1. **Mapeamento de Lacunas:** Compara competências autodeclaradas com matrizes de habilidades por tecnologia e nível.
+2. **Trilhas e Desafios Direcionados:** Sugere passos práticos sequenciais para cobrir as lacunas identificadas.
+3. **Interoperabilidade para Agentes de IA:** Expõe todo o catálogo e regras de negócio através de ferramentas MCP, permitindo que agentes autônomos consultem e operem sobre a base de conhecimento.
+
+---
+
+## 🏗️ Arquitetura do Sistema
+
+A aplicação foi desenhada com separação estrita de responsabilidades: o motor de regras de negócio (`core`) é totalmente desacoplado das camadas de entrega (Web, CLI e MCP).
+
+```mermaid
+flowchart TD
+    subgraph Interfaces["Camadas de Entrada / Interfaces"]
+        UI["🌐 Web App (Streamlit Cloud)"]
+        CLI["💻 Terminal CLI (main.py)"]
+        MCP["🤖 MCP Server (stdio Tools)"]
+    end
+
+    subgraph Core["Camada de Negócio e Domínio"]
+        LOADER["Core Data Loader"]
+        ANALYZER["Competency Analyzer"]
+        MODELS["Data Models (Pydantic / Enums)"]
+    end
+
+    subgraph Data["Armazenamento"]
+        JSON_PATHS[("learning_paths.json")]
+        JSON_CHALLENGES[("challenges.json")]
+    end
+
+    UI --> LOADER
+    UI --> ANALYZER
+    CLI --> LOADER
+    CLI --> ANALYZER
+    MCP --> LOADER
+    MCP --> ANALYZER
+
+    LOADER --> JSON_PATHS
+    LOADER --> JSON_CHALLENGES
+    ANALYZER --> MODELS
+```
+
+---
 ## Evidências da aplicação
 
 ![Página inicial do Geo-Explorer](docs/assets/01-home.png)
